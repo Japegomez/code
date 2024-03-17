@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify, url_for
 from weblablib import WebLab, requires_active, requires_login, weblab_user
 
+# sudo service redis-server start
 # set FLASK_APP=laboratory.py
 # set FLASK_DEBUG=1
 # flask run
