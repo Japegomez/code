@@ -18,8 +18,6 @@ function clean() {
     clearInterval(TIME_LEFT);
     $("#panel").hide();
     $("#timer").text("session is over");
-    //refresh whole index.html in jquery
-    location.reload();
 }
 
 function parseStatus(newStatus) {
