@@ -1,0 +1,117 @@
+# Translations template for complete.
+# Copyright (C) 2024 ORGANIZATION
+# This file is distributed under the same license as the complete project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: complete 0.1\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-03-19 12:19+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.14.0\n"
+
+#: mylab/client.py:37 mylab/hardware.py:128
+#, python-format
+msgid "Programming: %(step)s"
+msgstr ""
+
+#: mylab/client.py:39 mylab/hardware.py:130
+msgid "Empty memory"
+msgstr ""
+
+#: mylab/client.py:41 mylab/hardware.py:132
+msgid "Programming failed"
+msgstr ""
+
+#: mylab/client.py:43 mylab/hardware.py:134
+msgid "Programming worked!"
+msgstr ""
+
+#: mylab/client.py:45 mylab/hardware.py:136
+#, python-format
+msgid "Invalid state: %(state)s"
+msgstr ""
+
+#: mylab/templates/_bootstrap.html:9
+msgid "My lab"
+msgstr ""
+
+#: mylab/templates/index.html:8
+msgid "Welcome to <strong>mylab</strong>!"
+msgstr ""
+
+#: mylab/templates/index.html:19
+msgid "Your session is expired"
+msgstr ""
+
+#: mylab/templates/index.html:22
+msgid ""
+"However, given that in <tt>views.py</tt> the view <tt>index</tt> is using"
+"\n"
+"                <tt>@requires_login</tt> instead of "
+"<tt>@requires_active</tt>, the user can still access the lab"
+msgstr ""
+
+#: mylab/templates/index.html:27
+msgid "Go back"
+msgstr ""
+
+#: mylab/templates/index.html:34
+msgid "Log out"
+msgstr ""
+
+#: mylab/templates/index.html:42
+#, python-format
+msgid ""
+"This is just an example laboratory using <a "
+"href='%(link)s'>weblablib</a>. Imagine that we have\n"
+"            2 lights and a microcontroller with some code that interacts "
+"with them. Here we can turn on and off the\n"
+"            lights and send programs to the microcontroller to switch "
+"them on."
+msgstr ""
+
+#: mylab/templates/index.html:45
+msgid "Time:"
+msgstr ""
+
+#: mylab/templates/index.html:51
+msgid "Lights: click on each light to change status (and read it in the console)"
+msgstr ""
+
+#: mylab/templates/index.html:57
+#, python-format
+msgid "Light %(number)s"
+msgstr ""
+
+#: mylab/templates/index.html:69
+msgid "Microcontroller status:"
+msgstr ""
+
+#: mylab/templates/index.html:72
+msgid "Send code to the microcontroller"
+msgstr ""
+
+#: mylab/templates/index.html:78
+msgid "Error"
+msgstr ""
+
+#: mylab/templates/index.html:96
+msgid "Time is over!"
+msgstr ""
+
+#: mylab/templates/index.html:99
+msgid "1 second"
+msgstr ""
+
+#: mylab/templates/index.html:100
+msgid "NUM seconds"
+msgstr ""
+
