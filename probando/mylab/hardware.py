@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, print_function, division
 
-import os
-import time
+import RPi.GPIO as gpio
 from mylab import weblab, redis, socketio
 
 from flask_babel import gettext
@@ -18,7 +17,7 @@ in a Redis database (in memory). You will have:
  - 2 lights (0..1)
  - 1 microcontroller, which interacts with the lights
 
-In Redis, we'll work with 11 variables for this:
+In Redis, we'll work with 3 variables for this:
 
  - hardware:lights:0 {on|off}
  - hardware:lights:1 {on|off}
@@ -78,23 +77,6 @@ def clean_resources():
     print("Microcontroller restarted")
 
 
-def switch_light(number, state):
-    if state:
-        print("************************************************************************")
-        print("  User {} (local identifier: {})".format(
-            weblab_user.username, weblab_user.data['local_identifier']))
-        print("  Imagine that light {} is turning on!                                  ".format(number))
-        print("************************************************************************")
-        redis.set('client:lights:{}'.format(number), 'off')
-    else:
-        print("************************************************************************")
-        print("  User {} (local identifier: {})".format(
-            weblab_user.username, weblab_user.data['local_identifier']))
-        print("  Imagine that light {} is turning off!                                 ".format(number))
-        print("************************************************************************")
-        redis.set('client:lights:{}'.format(number), 'on')
-
-
 def is_light_on(number):
     return redis.get('hardware:lights:{}'.format(number)) == 'on'
 
@@ -144,9 +126,9 @@ def hardware_status():
 
 
 @weblab.task(unique='global')
-def program_device(code):
+def program_device(client_status):
 
-    if weblab_user.time_left < 3:
+    if weblab_user.time_left < 10:
         print("************************************************************************")
         print("Error: typically, programming the device takes around 10 seconds. So if ")
         print("the user has less than 10 seconds (%.2f) to use the laboratory, don't start " %
@@ -166,32 +148,21 @@ def program_device(code):
     print("case, this is lasting for 10 seconds from now ")
     print("************************************************************************")
 
+    
     if redis.set('hardware:microcontroller:programming', 0) == 0:
         # Just in case two programs are sent at the very same time
         return {
             'success': False,
             'reason': "Already programming"
         }
-
-    socketio.emit('board-status', hardware_status(), namespace='/mylab')
-
-    for step in range(10):
-        time.sleep(1)
-        redis.set('hardware:microcontroller:programming', step)
-        socketio.emit('board-status', hardware_status(), namespace='/mylab')
-        print("Still programming...")
-
-    if code == 'division-by-zero':
-        print("************************************************************************")
-        print("Oh no! It was a division-by-zero code! Expect an error!")
-        print("************************************************************************")
-        pipeline = redis.pipeline()
-        pipeline.set('hardware:microcontroller:state', 'failed')
-        pipeline.delete('hardware:microcontroller:programming')
-        pipeline.execute()
-        socketio.emit('board-status', hardware_status(), namespace='/mylab')
-        10 / 0  # Force an exception to be raised
-
+    
+    
+    redis.set('hardware:microcontroller:programming', 0)
+    socketio.emit('client-status', client_status, namespace='/mylab')
+    print("Still programming...")
+    
+    ## if light 1 is on 
+    
     print("************************************************************************")
     print("Yay! the robot has been programmed! Now you can retrieve the result ")
     print("************************************************************************")
@@ -199,8 +170,8 @@ def program_device(code):
     pipeline.set('hardware:microcontroller:state', 'programmed')
     pipeline.delete('hardware:microcontroller:programming')
     pipeline.execute()
-
-    socketio.emit('board-status', hardware_status(), namespace='/mylab')
+    
+    socketio.emit('client-status', client_status, namespace='/mylab')
     return {
         'success': True
     }
