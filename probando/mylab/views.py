@@ -4,8 +4,8 @@ from flask import Blueprint, url_for, render_template, jsonify, session, current
 from flask_socketio import emit
 
 from mylab import weblab, socketio
-from mylab.client import client_status
-from mylab.hardware import program_device, switch_light, hardware_status
+from mylab.client import client_status, switch_light
+from mylab.hardware import program_device, hardware_status
 
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
 
@@ -51,17 +51,15 @@ def lights_event(data):
     switch_light(number, state)
     emit('client-status', client_status(), namespace='/mylab')
 
-
 @socketio.on('program', namespace='/mylab')
 @socket_requires_active
-def microcontroller(data):
-    code = data.get('code') or "code"
-
+def microcontroller():
+    
     # If there are running tasks, don't let them send the program
     if len(weblab.running_tasks):
         return jsonify(error=True, message="Other tasks being run")
 
-    task = program_device.delay(code)
+    task = program_device.delay()
 
     # Playing with a task:
     current_app.logger.debug("New task! {}".format(task.task_id))
@@ -72,9 +70,11 @@ def microcontroller(data):
     current_app.logger.debug(" - Result: {}".format(task.result))
     current_app.logger.debug(" - Error: {}".format(task.error))
 
-    emit('board-status', hardware_status(), namespace='/mylab')
-
-
+@socketio.on('configure-board', namespace='/mylab')
+@socket_requires_active
+def configure_board():
+    emit('client-status', client_status(), namespace='/mylab')
+    
 @main_blueprint.route('/logout', methods=['POST'])
 @requires_login
 def logout_view():

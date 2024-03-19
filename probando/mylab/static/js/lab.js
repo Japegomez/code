@@ -39,13 +39,9 @@ function turnLight(number, state) {
     socket.emit('lights', { number: number, state: state })
 }
 
-function sendProgram(code) {
-    socket.emit('program', { code: code })
+function sendProgram() {
+    socket.emit('program')
 }
-
-socket.on('board-status', function (data) {
-    parseStatus(data);
-});
 
 socket.on('client-status', function (data) {
     parseStatus(data);

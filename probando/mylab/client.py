@@ -6,6 +6,22 @@ from mylab.hardware import program_device
 LIGHTS = 2
 
 
+def switch_light(number, state):
+    if state:
+        print("************************************************************************")
+        print("  User {} (local identifier: {})".format(
+            weblab_user.username, weblab_user.data['local_identifier']))
+        print("  Light {} is turning on!                                  ".format(number))
+        print("************************************************************************")
+        redis.set('client:lights:{}'.format(number), 'off')
+    else:
+        print("************************************************************************")
+        print("  User {} (local identifier: {})".format(
+            weblab_user.username, weblab_user.data['local_identifier']))
+        print("  Light {} is turning off!                                 ".format(number))
+        print("************************************************************************")
+        redis.set('client:lights:{}'.format(number), 'on')
+
 
 
 def client_status():
@@ -34,7 +50,7 @@ def client_status():
 
     programming, state = results[LIGHTS:]
     if programming is not None:
-        microcontroller = gettext('Programming: %(step)s', step=programming)
+        microcontroller = gettext('Programming...')
     elif state == 'empty':
         microcontroller = gettext("Empty memory")
     elif state == 'failed':
