@@ -47,6 +47,10 @@ socket.on('board-status', function (data) {
     parseStatus(data);
 });
 
+socket.on('client-status', function (data) {
+    parseStatus(data);
+});
+
 socket.on('on-task', function (data) {
     console.log(data);
 });

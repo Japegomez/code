@@ -15,25 +15,18 @@ manage any code related to your hardware, for example.
 In this case, we're going to have a very simple laboratory that we will create
 in a Redis database (in memory). You will have:
 
- - 10 lights (0..9)
+ - 2 lights (0..1)
  - 1 microcontroller, which interacts with the lights
 
 In Redis, we'll work with 11 variables for this:
 
  - hardware:lights:0 {on|off}
  - hardware:lights:1 {on|off}
- - hardware:lights:2 {on|off}
- - hardware:lights:3 {on|off}
- - hardware:lights:4 {on|off}
- - hardware:lights:5 {on|off}
- - hardware:lights:6 {on|off}
- - hardware:lights:7 {on|off}
- - hardware:lights:8 {on|off}
- - hardware:lights:9 {on|off}
+ 
  - hardware:microcontroller {empty|programming|programmed|failed}
 """
 
-LIGHTS = 10
+LIGHTS = 2
 
 
 @weblab.on_start
@@ -52,6 +45,7 @@ def start(client_data, server_data):
 
     for light in range(LIGHTS):
         redis.set('hardware:lights:{}'.format(light), 'off')
+        redis.set('client:lights:{}'.format(light), 'off')
     redis.set('hardware:microcontroller:state', 'empty')
     redis.delete('hardware:microcontroller:programming')
 
@@ -91,12 +85,14 @@ def switch_light(number, state):
             weblab_user.username, weblab_user.data['local_identifier']))
         print("  Imagine that light {} is turning on!                                  ".format(number))
         print("************************************************************************")
-        redis.set('hardware:lights:{}'.format(number), 'off')
+        redis.set('client:lights:{}'.format(number), 'off')
     else:
         print("************************************************************************")
+        print("  User {} (local identifier: {})".format(
+            weblab_user.username, weblab_user.data['local_identifier']))
         print("  Imagine that light {} is turning off!                                 ".format(number))
         print("************************************************************************")
-        redis.set('hardware:lights:{}'.format(number), 'on')
+        redis.set('client:lights:{}'.format(number), 'on')
 
 
 def is_light_on(number):
@@ -150,7 +146,7 @@ def hardware_status():
 @weblab.task(unique='global')
 def program_device(code):
 
-    if weblab_user.time_left < 10:
+    if weblab_user.time_left < 3:
         print("************************************************************************")
         print("Error: typically, programming the device takes around 10 seconds. So if ")
         print("the user has less than 10 seconds (%.2f) to use the laboratory, don't start " %

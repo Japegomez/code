@@ -4,6 +4,7 @@ from flask import Blueprint, url_for, render_template, jsonify, session, current
 from flask_socketio import emit
 
 from mylab import weblab, socketio
+from mylab.client import client_status
 from mylab.hardware import program_device, switch_light, hardware_status
 
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
@@ -39,7 +40,7 @@ def index():
 @socketio.on('connect', namespace='/mylab')
 @socket_requires_active
 def connect_handler():
-    emit('board-status', hardware_status(), namespace='/mylab')
+    emit('client-status', client_status(), namespace='/mylab')
 
 
 @socketio.on('lights', namespace='/mylab')
@@ -48,7 +49,7 @@ def lights_event(data):
     state = data['state']
     number = data['number'] - 1
     switch_light(number, state)
-    emit('board-status', hardware_status(), namespace='/mylab')
+    emit('client-status', client_status(), namespace='/mylab')
 
 
 @socketio.on('program', namespace='/mylab')
