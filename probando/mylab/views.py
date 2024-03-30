@@ -40,16 +40,15 @@ def index():
 @socketio.on('connect', namespace='/mylab')
 @socket_requires_active
 def connect_handler():
-    emit('client-status', client_status(), namespace='/mylab')
-
+    emit('update-client', client_status(), namespace='/mylab')
 
 @socketio.on('lights', namespace='/mylab')
 @socket_requires_active
 def lights_event(data):
     state = data['state']
-    number = data['number'] - 1
+    number = data['number']
     switch_light(number, state)
-    emit('client-status', client_status(), namespace='/mylab')
+    emit('update-client', client_status(), namespace='/mylab')
 
 @socketio.on('program', namespace='/mylab')
 @socket_requires_active
@@ -70,11 +69,6 @@ def microcontroller():
     current_app.logger.debug(" - Result: {}".format(task.result))
     current_app.logger.debug(" - Error: {}".format(task.error))
 
-@socketio.on('configure-board', namespace='/mylab')
-@socket_requires_active
-def configure_board():
-    emit('client-status', client_status(), namespace='/mylab')
-    
 @main_blueprint.route('/logout', methods=['POST'])
 @requires_login
 def logout_view():

@@ -43,7 +43,7 @@ function sendProgram() {
     socket.emit('program')
 }
 
-socket.on('client-status', function (data) {
+socket.on('update-client', function (data) {
     parseStatus(data);
 });
 
@@ -64,11 +64,11 @@ var HIDE_MESSAGES_BOX = null;
 function parseStatus(newStatus) {
     for (var i = 1; i < 3; i++) {
         if (newStatus["lights"]["light-" + i]) {
-            $("#light_" + i + "_on").hide();
-            $("#light_" + i + "_off").show();
-        } else {
-            $("#light_" + i + "_off").hide();
             $("#light_" + i + "_on").show();
+            $("#light_" + i + "_off").hide();
+        } else {
+            $("#light_" + i + "_off").show();
+            $("#light_" + i + "_on").hide();
         }
     }
     $("#microcontroller_status").text(newStatus["microcontroller"]);

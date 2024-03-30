@@ -13,14 +13,14 @@ def switch_light(number, state):
             weblab_user.username, weblab_user.data['local_identifier']))
         print("  Light {} is turning on!                                  ".format(number))
         print("************************************************************************")
-        redis.set('client:lights:{}'.format(number), 'off')
+        redis.set('client:lights:{}'.format(number), 'on')
     else:
         print("************************************************************************")
         print("  User {} (local identifier: {})".format(
             weblab_user.username, weblab_user.data['local_identifier']))
         print("  Light {} is turning off!                                 ".format(number))
         print("************************************************************************")
-        redis.set('client:lights:{}'.format(number), 'on')
+        redis.set('client:lights:{}'.format(number), 'off')
 
 
 
@@ -50,7 +50,7 @@ def client_status():
 
     programming, state = results[LIGHTS:]
     if programming is not None:
-        microcontroller = gettext('Programming...')
+        microcontroller = gettext('Programming: %(step)s', step=programming)
     elif state == 'empty':
         microcontroller = gettext("Empty memory")
     elif state == 'failed':

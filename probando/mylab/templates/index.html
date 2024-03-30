@@ -56,9 +56,9 @@
             <div class="col-sm-1 text-center">
                 {{ gettext("Light %(number)s", number=light) }}
                 <br>
-                <a href="javascript:turnOff({{ light }})"><img width="50px" id="light_{{ light }}_on"
+                <a href="javascript:turnOff({{ light-1 }})"><img width="50px" id="light_{{ light}}_on"
                         src="https://files.labsland.com/pub/docs/weblablib/light-on.png"></a>
-                <a href="javascript:turnOn({{ light }})"><img width="50px" id="light_{{ light }}_off"
+                <a href="javascript:turnOn({{ light-1 }})"><img width="50px" id="light_{{ light }}_off"
                         src="https://files.labsland.com/pub/docs/weblablib/light-off.png"></a>
             </div>
             {% endfor %}
