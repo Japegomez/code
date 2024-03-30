@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, print_function, division
+import time
 
 import RPi.GPIO as gpio
 from mylab import weblab, redis, socketio
 
 from flask_babel import gettext
-
 from weblablib import weblab_user
-
+import mylab.client
 """
 This module is just an example of how you could organize your code. Here you would
 manage any code related to your hardware, for example.
@@ -26,7 +26,9 @@ In Redis, we'll work with 3 variables for this:
 """
 
 LIGHTS = 2
-
+gpio.setmode(gpio.BOARD)
+gpio.setup(12, gpio.OUT)
+gpio.setup(16, gpio.OUT)
 
 @weblab.on_start
 def start(client_data, server_data):
@@ -126,7 +128,7 @@ def hardware_status():
 
 
 @weblab.task(unique='global')
-def program_device(client_status):
+def program_device():
 
     if weblab_user.time_left < 10:
         print("************************************************************************")
@@ -156,13 +158,41 @@ def program_device(client_status):
             'reason': "Already programming"
         }
     
-    
+    #change programming to 0
     redis.set('hardware:microcontroller:programming', 0)
-    socketio.emit('client-status', client_status, namespace='/mylab')
-    print("Still programming...")
+    socketio.emit('update-client', mylab.client.client_status(), namespace='/mylab')
     
-    ## if light 1 is on 
-    
+    for step in range(1,5):
+        time.sleep(1)
+        redis.set('hardware:microcontroller:programming', step)
+        socketio.emit('update-client', mylab.client.client_status(), namespace='/mylab')
+        print("Still programming...")
+
+    pipeline = redis.pipeline()
+    for i in range(LIGHTS) :
+        redis_value = redis.get(f'client:lights:{i}')
+        print(f"client:lights:{i}={redis_value}")
+        if (redis.get('client:lights:{}'.format(i)) == 'on'):
+            pipeline.set('hardware:lights:{}'.format(i), 'on')
+
+            if(i == 0):
+                gpio.output(12, True)
+                print("encendiendo gpio12")
+            if(i == 1):
+                gpio.output(16,True)
+                print("encendiendo gpio16")
+        else:
+            pipeline.set('hardware:lights:{}'.format(i), 'off')
+
+            if (i == 0):
+                gpio.output(12, False)
+                print("apagando gpio12")
+                
+            if (i == 1):
+                gpio.output(16, False)
+                print("apagando gpio16")
+    pipeline.execute()
+
     print("************************************************************************")
     print("Yay! the robot has been programmed! Now you can retrieve the result ")
     print("************************************************************************")
@@ -171,7 +201,7 @@ def program_device(client_status):
     pipeline.delete('hardware:microcontroller:programming')
     pipeline.execute()
     
-    socketio.emit('client-status', client_status, namespace='/mylab')
+    socketio.emit('update-client', hardware_status(), namespace='/mylab')
     return {
         'success': True
     }
