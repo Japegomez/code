@@ -31,17 +31,16 @@ class Config(object):
     SESSION_COOKIE_PATH = '/'
     WEBLAB_SESSION_ID_NAME = 'wl-mylab'
     WEBLAB_REDIS_BASE = 'complete-example'
-    SERVER_NAME = 'pi:5000'
     
     # If you put this, for example, then you should configure
     # WebLab-Deusto to use http://<lab-server>/foo/weblab/
-    WEBLAB_BASE_URL = '/deusto'
+    WEBLAB_BASE_URL = '/foo'
 
-    WEBLAB_NO_THREAD = False
+    WEBLAB_NO_THREAD = True
 
     # Other parameters (and default values):
     #
-    WEBLAB_TIMEOUT = 3600 # If the user doesn't reply in 3600 seconds, consider expired
+    WEBLAB_TIMEOUT = 60 # If the user doesn't reply in 15 seconds, consider expired
     # WEBLAB_REDIS_URL = 'redis://localhost:6379/0'
     # WEBLAB_TASK_EXPIRES = 3600 # Time to expire the session results
     # WEBLAB_AUTOPOLL = True # Every method calls poll()

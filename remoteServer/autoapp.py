@@ -1,6 +1,13 @@
 import os
 from mylab import create_app
+# sudo service redis-server start
+# set FLASK_DEBUG=1 # If developing
+# set FLASK_APP=autoapp.py
+# python run_debug.py if FlaskSocketIO is installed
 
+# flask weblab loop
+
+# flask weblab fake new
 if os.environ.get('FLASK_DEBUG') == '1':
     config_name = 'development'
 else:

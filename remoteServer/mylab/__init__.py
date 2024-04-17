@@ -3,7 +3,6 @@ from __future__ import unicode_literals, print_function, division
 import time
 from flask import Flask, request, session, has_request_context
 from flask_babel import Babel
-from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_redis import FlaskRedis
 from flask_socketio import SocketIO
@@ -28,12 +27,10 @@ def create_app(config_name):
     app with those settings. Check 'config.py' for further information.
     """
     app = Flask(__name__)
-    CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
-
-
     config_class = config[config_name]
     print("{}: Using config: {}".format(time.asctime(), config_class.__name__))
     app.config.from_object(config_class)
+
     # Initialize the Flask plug-ins (including WebLab)
     weblab.init_app(app)
     toolbar.init_app(app)

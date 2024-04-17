@@ -10,4 +10,4 @@ else:
     config_name = os.environ.get('FLASK_CONFIG') or 'default'
 
 app = create_app(config_name)
-socketio.run(app, host="0.0.0.0")
+socketio.run(app)

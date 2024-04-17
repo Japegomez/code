@@ -1,12 +1,13 @@
-import uuid
-from flask import Blueprint, Response, url_for, render_template, jsonify, session, current_app, request
-from flask_cors import cross_origin
+import time
+
+from flask import Blueprint, url_for, render_template, jsonify, session, current_app, request
 from flask_socketio import emit
-from mylab import weblab
-from mylab.hardware import capture_image, configure_lab, get_measurements
+
+from mylab import weblab, socketio
+from mylab.client import client_status, switch_light
+from mylab.hardware import program_device, hardware_status
+
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
-from mylab.api.models import Session, User
-from mylab.api.schemas import ImageSchema, MeasurementSchema, SessionSchema
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -16,7 +17,8 @@ def initial_url():
     """
     Where do we send the user when a new user comes?
     """
-    return "http://pi:4200"
+    return url_for('main.index')
+
 
 @main_blueprint.route('/')
 @requires_login
@@ -28,37 +30,44 @@ def index():
 
     return render_template("index.html")
 
-@main_blueprint.route('/api/v1/config', methods=['GET'])
-@requires_login
-def config():
-    user = User(id=uuid.uuid4(), name=weblab_user.username, isActive=weblab_user.active)
-    session = Session(id=uuid.uuid4(), assigned_time=weblab_user.time_left, user=user)
-    return SessionSchema(include_data=("user",)).dump(session)
+###################################################################
+#
+#
+# Socket-IO management
+#
 
 
-@main_blueprint.route('/api/v1/lab/<caso>/<int:numero>', methods=['GET'])
-@requires_active
-def configureLab(caso, numero):
-   
+@socketio.on('connect', namespace='/mylab')
+@socket_requires_active
+def connect_handler():
+    emit('update-client', client_status(), namespace='/mylab')
+
+@socketio.on('lights', namespace='/mylab')
+@socket_requires_active
+def lights_event(data):
+    state = data['state']
+    number = data['number']
+    switch_light(number, state)
+    emit('update-client', client_status(), namespace='/mylab')
+
+@socketio.on('program', namespace='/mylab')
+@socket_requires_active
+def microcontroller():
+    
+    # If there are running tasks, don't let them send the program
     if len(weblab.running_tasks):
         return jsonify(error=True, message="Other tasks being run")
-    
-    task = configure_lab.delay(caso, numero)
-    print(task.status)
 
-    measurements = get_measurements(caso, numero)
+    task = program_device.delay()
 
-    return MeasurementSchema().dump(measurements)
-    
+    # Playing with a task:
+    current_app.logger.debug("New task! {}".format(task.task_id))
+    current_app.logger.debug(" - Name: {}".format(task.name))
+    current_app.logger.debug(" - Status: {}".format(task.status))
 
-@main_blueprint.route('/api/v1/image', methods=['GET'])
-@requires_active
-def get_image():
-    image = capture_image()
-    if image:
-        return Response(image, mimetype='image/jpeg')
-    return jsonify({'error': 'Failed to capture image'}), 500
-
+    # Result and error will be None unless status is 'done' or 'failed'
+    current_app.logger.debug(" - Result: {}".format(task.result))
+    current_app.logger.debug(" - Error: {}".format(task.error))
 
 @main_blueprint.route('/logout', methods=['POST'])
 @requires_login
@@ -70,6 +79,12 @@ def logout_view():
         logout()
 
     return jsonify(error=False)
+
+#######################################################
+#
+#   Other functions
+#
+
 
 def _check_csrf():
     expected = session.get('csrf')
