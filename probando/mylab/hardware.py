@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, print_function, division
 import time
 
-import RPi.GPIO as gpio
+# import RPi.GPIO as gpio
 from mylab import weblab, redis, socketio
 
 from flask_babel import gettext
@@ -26,9 +26,9 @@ In Redis, we'll work with 3 variables for this:
 """
 
 LIGHTS = 2
-gpio.setmode(gpio.BOARD)
-gpio.setup(12, gpio.OUT)
-gpio.setup(16, gpio.OUT)
+# gpio.setmode(gpio.BOARD)
+# gpio.setup(12, gpio.OUT)
+# gpio.setup(16, gpio.OUT)
 
 @weblab.on_start
 def start(client_data, server_data):
