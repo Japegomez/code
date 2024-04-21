@@ -1,23 +1,8 @@
-
-
-
-
-<!--
-// v0 by Vercel.
-// https://v0.dev/t/oMIChU6kJ6g
--->
-
-<!--
-// v0 by Vercel.
-// https://v0.dev/t/oMIChU6kJ6g
--->
-
 <div class="max-w-5xl mx-auto my-10 p-6 bg-white shadow-lg rounded-lg">
     <div class="flex justify-between items-center mb-8">
         <div class="flex items-center">
             <div class="mr-4">
                 <mat-spinner mode="determinate"	value="10"></mat-spinner>
-                <p>10s</p>
             </div>
             <div>
                 <button
@@ -26,13 +11,11 @@
                 </button>
             </div>
         </div>
-        <div class="text-2xl font-semibold">Welcome, username</div>
+        <div class="text-2xl font-semibold">Bienvenido, Javi</div>
     </div>
     <div class="mb-8">
         <div dir="ltr" data-orientation="horizontal">
             <app-toggle-button (valueChange)="setTipoCircuito($event)"></app-toggle-button>
-            
-            
             @if (tipoCircuito==="EnSerie") {
             <app-en-serie></app-en-serie>
             } @else if (tipoCircuito==="EnParalelo") {
@@ -42,23 +25,6 @@
             } @else {
             <h1>ningun tipo seleccionado</h1>
             }
-            <!-- <div>
-                <button type="button" role="combobox" aria-controls="radix-:r4f:" aria-expanded="false"
-                    aria-autocomplete="none" dir="ltr" data-state="closed" data-placeholder=""
-                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    id="dropdown">
-                    <span style="pointer-events: none;">Select category</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="h-4 w-4 opacity-50" aria-hidden="true">
-                        <path d="m6 9 6 6 6-6"></path>
-                    </svg>
-                </button>
-                <select aria-hidden="true" tabindex="-1"
-                    style="position: absolute; border: 0px; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; overflow-wrap: normal;">
-                    <option value=""></option>
-                </select>
-            </div> -->
         </div>
     </div>
     <!-- <div class="grid grid-cols-2 gap-8 mb-8">
