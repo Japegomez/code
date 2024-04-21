@@ -19,6 +19,18 @@ def initial_url():
     """
     return url_for('main.index') #"localhost:4200" instead of "main.index"
 
+@main_blueprint.route('/api/v1/simulate', methods=['POST'])
+def simulate():
+    if not _check_csrf():
+        return jsonify(error=True, message="Invalid JSON")
+
+    data = request.json
+    if not data:
+        return jsonify(error=True, message="Invalid JSON")
+
+    hardware_status(data)
+
+    return jsonify(error=False)
 
 @main_blueprint.route('/')
 @requires_login

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TimerComponent } from './timer.component';
+import { EnParaleloFormComponent } from './en-paralelo-form.component';
 
-describe('TimerComponent', () => {
-  let component: TimerComponent;
-  let fixture: ComponentFixture<TimerComponent>;
+describe('EnParaleloFormComponent', () => {
+  let component: EnParaleloFormComponent;
+  let fixture: ComponentFixture<EnParaleloFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TimerComponent]
+      imports: [EnParaleloFormComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(TimerComponent);
+    fixture = TestBed.createComponent(EnParaleloFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
