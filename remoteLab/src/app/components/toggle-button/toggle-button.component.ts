@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, Input, output } from '@angular/core';
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 
 @Component({
@@ -10,15 +10,15 @@ import { MatButtonToggleModule } from "@angular/material/button-toggle";
   styleUrl: './toggle-button.component.css'
 })
 export class ToggleButtonComponent {
-  buttonSelected = 'EnSerie';
-  @Output() valueChange = new EventEmitter<string>();
+  @Input() buttonSelected!: string;
+  buttonSelectedChange = output<string>()
   
-  ngOnInit() {
-    this.valueChange.emit(this.buttonSelected);
-  }
+  // ngOnInit() {
+  //   this.valueChange.emit(this.buttonSelected);
+  // }
 
-  onValChange(value: string) {
+  changeButtonSelected(value: string) {
     this.buttonSelected = value;
-    this.valueChange.emit(value);
+    this.buttonSelectedChange.emit(value);
   }
 }

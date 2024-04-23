@@ -15,40 +15,17 @@
     </div>
     <div class="mb-8">
         <div dir="ltr" data-orientation="horizontal">
-            <app-toggle-button (valueChange)="setTipoCircuito($event)"></app-toggle-button>
+            <app-toggle-button  [(buttonSelected)]="tipoCircuito"></app-toggle-button>
+            <!-- [buttonSelected]="tipoCircuito" (buttonSelectedChange)="setTipoCircuito($event)" TODO: Two-way binding -->  
             @if (tipoCircuito==="EnSerie") {
             <app-en-serie></app-en-serie>
             } @else if (tipoCircuito==="EnParalelo") {
             <app-en-paralelo></app-en-paralelo>
             } @else if (tipoCircuito==="SerieYParalelo") {
-            <h1>Serie + Paralelo</h1>
+            <app-serie-yparalelo></app-serie-yparalelo>
             } @else {
             <h1>ningun tipo seleccionado</h1>
             }
         </div>
     </div>
-    <!-- <div class="grid grid-cols-2 gap-8 mb-8">
-        <div>
-            <img src="/placeholder.svg" alt="Placeholder" class="w-full h-auto shadow-sm" width="600" height="400"
-                style="aspect-ratio: 600 / 400; object-fit: cover;" />
-            <div class="flex justify-between items-center mt-4">
-                <div class="flex space-x-4">
-                    <input
-                        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm"
-                        placeholder="Numbers" />
-                    <button
-                        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 shadow-sm">
-                        Search
-                    </button>
-                </div>
-                <button
-                    class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2 shadow-sm">
-                    Simulate
-                </button>
-            </div>
-        </div>
-        <div class="shadow-sm rounded-lg">
-            <span class="w-full h-full rounded-md bg-muted"></span>
-        </div>
-    </div> -->
 </div>

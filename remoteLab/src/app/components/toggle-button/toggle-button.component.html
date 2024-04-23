@@ -1,14 +1,14 @@
 <div>
     <h3>Seleccione el tipo de circuito:</h3>
-        <button (click)="onValChange('EnSerie')"
+        <button (click)="changeButtonSelected('EnSerie')"
             class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 flex-1" [class.bg-amber-200]="buttonSelected === 'EnSerie'">
             En serie
     </button>
-    <button (click)="onValChange('EnParalelo')"
+    <button (click)="changeButtonSelected('EnParalelo')"
         class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 flex-1"  [class.bg-amber-200]="buttonSelected === 'EnParalelo'">
         En paralelo
     </button>
-    <button value="SerieYParalelo" (click)="onValChange('SerieYParalelo')"
+    <button (click)="changeButtonSelected('SerieYParalelo')"
         class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2 flex-1"  [class.bg-amber-200]="buttonSelected === 'SerieYParalelo'">
         Serie + paralelo
     </button>
