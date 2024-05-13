@@ -1,7 +1,3 @@
-<div class="container">
-@if (isLogged){
-    <h1>Bienvenido {{username}}</h1>
-    <h1>Timer: </h1>
-} @else {
-    <h1>usuario no reconocido</h1>
-}   
+<div class="card-body">
+    <countdown [config]="config" (event)="handleEvent($event)" />
+</div>
