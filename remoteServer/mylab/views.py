@@ -1,13 +1,18 @@
 import time
 
 from flask import Blueprint, url_for, render_template, jsonify, session, current_app, request
+from flask_cors import cross_origin
 from flask_socketio import emit
+import weblablib
 
 from mylab import weblab, socketio
 from mylab.client import client_status, switch_light
 from mylab.hardware import program_device, hardware_status
 
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
+
+from mylab.templates.api.models import Session, User
+from mylab.templates.api.schemas import SessionSchema
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -17,20 +22,7 @@ def initial_url():
     """
     Where do we send the user when a new user comes?
     """
-    return url_for('main.index') #"localhost:4200" instead of "main.index"
-
-@main_blueprint.route('/api/v1/simulate', methods=['POST'])
-def simulate():
-    if not _check_csrf():
-        return jsonify(error=True, message="Invalid JSON")
-
-    data = request.json
-    if not data:
-        return jsonify(error=True, message="Invalid JSON")
-
-    hardware_status(data)
-
-    return jsonify(error=False)
+    return url_for('main.index') #"localhost:4200"
 
 @main_blueprint.route('/')
 @requires_login
@@ -42,12 +34,23 @@ def index():
 
     return render_template("index.html")
 
+@main_blueprint.route('/api/v1/config', methods=['GET'])
+@requires_login
+def config():
+    user = User(id="1", name=weblab_user.username, isActive=weblab_user.active)
+    session = Session(id="1", assigned_time=weblab_user.time_left, user=user)
+    return SessionSchema(include_data=("user",)).dump(session)
+
+
+@main_blueprint.route('/api/v1/lab/')
+@requires_active
+def lab():
+    return jsonify('ok')
 ###################################################################
 #
 #
 # Socket-IO management
 #
-
 
 @socketio.on('connect', namespace='/mylab')
 @socket_requires_active
