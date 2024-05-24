@@ -1,9 +1,9 @@
 import os
 from mylab import create_app
 # sudo service redis-server start
-# set FLASK_DEBUG=1 # If developing
-# set FLASK_APP=autoapp.py
-# python run_debug.py if FlaskSocketIO is installed
+# export FLASK_DEBUG=1 # If developing
+# export FLASK_APP=autoapp.py
+# python3.9 run_debug.py if FlaskSocketIO is installed
 
 # flask weblab loop
 
