@@ -32,37 +32,32 @@ def set_gpio(gpio, value):
 
 
 def set_HAEN(exp):
-	AddresByte = 0x40 + exp - 1
+	ControlByte = 0x40 + (exp - 1) * 2
 	set_gpio(8, 0)
-	spiComm.xfer2([AddresByte, 0x0a, 0x28], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x0a, 0x28], 5000000, 1000)
 	set_gpio(8, 1)
 
 # Set pins as output/input on both banks
 
 
 def set_pins(exp, output=1):
-	AddresByte = 0x40 + exp - 1
+	ControlByte = 0x40 + (exp - 1) * 2
 	valueByte = 0x00 if output else 0xff
 
 	set_gpio(8, 0)
-	spiComm.xfer2([AddresByte, 0x00, valueByte], 5000000, 1000)
-	set_gpio(8, 1)
-
-	set_gpio(8, 0)
-	spiComm.xfer2([0x40, 0x01, valueByte], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x00, valueByte], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x01, valueByte], 5000000, 1000)
 	set_gpio(8, 1)
 
 # Set output pins low level
 
 
 def set_low(exp):
-	AddresByte = 0x40 + exp - 1
-	set_gpio(8, 0)
-	spiComm.xfer2([AddresByte, 0x14, 0x00], 5000000, 1000)
-	set_gpio(8, 1)
+	ControlByte = 0x40 + (exp - 1) * 2
 
 	set_gpio(8, 0)
-	spiComm.xfer2([AddresByte, 0x15, 0x00], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x14, 0x00], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x15, 0x00], 5000000, 1000)
 	set_gpio(8, 1)
 
 
@@ -71,7 +66,7 @@ spiComm = spidev.SpiDev()
 spiComm.open(0, 0)
 
 
-for i in range(1, 5):
+for i in range(1, 4):
 	set_HAEN(i)
 	set_pins(i)
 	set_low(i)
