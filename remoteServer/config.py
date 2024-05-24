@@ -34,7 +34,7 @@ class Config(object):
     
     # If you put this, for example, then you should configure
     # WebLab-Deusto to use http://<lab-server>/foo/weblab/
-    WEBLAB_BASE_URL = '/foo'
+    WEBLAB_BASE_URL = '/deusto'
 
     WEBLAB_NO_THREAD = True
 

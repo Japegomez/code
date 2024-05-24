@@ -7,7 +7,7 @@ from mylab import create_app
 
 # flask weblab loop
 
-# flask weblab fake new
+# flask weblab fake new --assigned-time 3600
 if os.environ.get('FLASK_DEBUG') == '1':
     config_name = 'development'
 else:
