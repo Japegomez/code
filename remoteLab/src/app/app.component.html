@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center mb-8">
         <div class="flex items-center">
             <div class="mr-4 text-xl font-semibold">
-                Tiempo restante: <app-timer></app-timer>
+                Tiempo restante: <app-timer [timeLeft]="tiempoRestante"></app-timer>
             </div>
             <div>
                 <button
@@ -11,7 +11,7 @@
                 </button>
             </div>
         </div>
-        <div class="text-2xl font-semibold">Bienvenido, Javi</div>
+        <div class="text-2xl font-semibold">Bienvenido, {{username}}</div>
     </div>
     <div class="mb-8">
         <div dir="ltr" data-orientation="horizontal">

@@ -6,7 +6,7 @@ import { EnSerieComponent } from './components/en-serie/en-serie.component';
 import { SerieYParaleloComponent } from './components/serie-yparalelo/serie-yparalelo.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ToggleButtonComponent } from './components/toggle-button/toggle-button.component';
-import { UserSession } from './interfaces/user';
+import { GetSessionConfigResponse } from './interfaces/sessionConfig';
 import { APIService } from './services/api.service';
 
 @Component({
@@ -19,13 +19,17 @@ import { APIService } from './services/api.service';
 export class AppComponent {
   title = 'LabRemoto';
   tipoCircuito = "EnSerie";
+  username = ""
+  tiempoRestante = 0;
   
   constructor(private apiService: APIService) {
   }
   ngOnInit() {
-    this.apiService.getSessionConfig().subscribe((data:UserSession) => {
-      this.apiService.user = data;
-      console.log(this.apiService.user);
+    this.apiService.getSessionConfig().subscribe((data: GetSessionConfigResponse) => {
+      const user = data.included.find(e => e.id === data.data.id);
+      if (!user) return;
+      this.username = user.attributes.name;
+      this.tiempoRestante = data.data.attributes.assigned_time;
     }
     );
   }
