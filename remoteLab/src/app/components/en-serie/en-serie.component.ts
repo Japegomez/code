@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { APIService } from '../../services/api.service';
 
 @Component({
   selector: 'app-en-serie',
@@ -15,8 +16,11 @@ export class EnSerieComponent {
   valorR1: number | undefined;
   isCorrect: boolean = false;
 
-  sendSignals() {
-    this.checkValues();
+  constructor(private apiService: APIService) {
+  }
+
+  myFunction() {
+    this.apiService.runLabConfig("EnSerie", 1);
   }
   checkValues() {
     if (this.valorR1 === 100 || this.valorR1 === 300) {

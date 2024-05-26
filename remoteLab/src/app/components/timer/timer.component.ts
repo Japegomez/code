@@ -1,8 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { CountdownComponent, CountdownConfig, CountdownEvent } from 'ngx-countdown';
-
-const KEY = 'time';
-const DEFAULT = 4;
 
 @Component({
   selector: 'app-timer',
@@ -10,28 +7,31 @@ const DEFAULT = 4;
     '[class.card]': `true`,
     '[class.text-center]': `true`,
   },
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
   standalone: true,
   templateUrl: './timer.component.html',
   imports: [CountdownComponent],
 })
 export class TimerComponent implements OnInit {
-  config: CountdownConfig = { leftTime: DEFAULT, notify: 0 };
+  @Input() timeLeft = 0;
+  config: CountdownConfig = { leftTime: -1, notify: 0 };
+  @ViewChild('countdown') counter!: CountdownComponent;
+
   ngOnInit(): void {
-    let value = +localStorage.getItem(KEY)!!;
-    if (value <= 0) value = DEFAULT;
-    this.config = { ...this.config, leftTime: value };
+    this.config = { ...this.config, leftTime: this.timeLeft };
+  }
+
+  ngOnChanges() {
+    if (this.counter) {
+      this.config.leftTime = this.timeLeft;
+      this.counter.config = this.config;
+      this.counter?.restart();
+    }
   }
 
   handleEvent(ev: CountdownEvent) {
-    if (ev.action === 'notify') {
-      // Save current value
-      localStorage.setItem(KEY, `${ev.left / 1000}`);
-
-      if ( ev.left === 0 ) {
-        // Reset value
-        console.log('Time is up!');
-      }
+    if (ev.action === 'notify' && ev.left === 0 && this.counter) {
+      alert("Se ha acabado el tiempo"); // muestra por pantalla
     }
   }
 }

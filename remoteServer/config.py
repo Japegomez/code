@@ -31,6 +31,7 @@ class Config(object):
     SESSION_COOKIE_PATH = '/'
     WEBLAB_SESSION_ID_NAME = 'wl-mylab'
     WEBLAB_REDIS_BASE = 'complete-example'
+    SERVER_NAME = 'pi:5000'
     
     # If you put this, for example, then you should configure
     # WebLab-Deusto to use http://<lab-server>/foo/weblab/
