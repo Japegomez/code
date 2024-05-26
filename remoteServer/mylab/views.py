@@ -22,7 +22,7 @@ def initial_url():
     """
     Where do we send the user when a new user comes?
     """
-    return url_for('main.index') #"localhost:4200"
+    return "http://pi:4200"
 
 @main_blueprint.route('/')
 @requires_login
