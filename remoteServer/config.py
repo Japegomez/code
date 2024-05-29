@@ -37,11 +37,11 @@ class Config(object):
     # WebLab-Deusto to use http://<lab-server>/foo/weblab/
     WEBLAB_BASE_URL = '/deusto'
 
-    WEBLAB_NO_THREAD = True
+    WEBLAB_NO_THREAD = False
 
     # Other parameters (and default values):
     #
-    WEBLAB_TIMEOUT = 60 # If the user doesn't reply in 15 seconds, consider expired
+    WEBLAB_TIMEOUT = 3600 # If the user doesn't reply in 3600 seconds, consider expired
     # WEBLAB_REDIS_URL = 'redis://localhost:6379/0'
     # WEBLAB_TASK_EXPIRES = 3600 # Time to expire the session results
     # WEBLAB_AUTOPOLL = True # Every method calls poll()
