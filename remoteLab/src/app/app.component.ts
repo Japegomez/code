@@ -26,8 +26,12 @@ export class AppComponent {
   }
   ngOnInit() {
     this.apiService.getSessionConfig().subscribe((data: GetSessionConfigResponse) => {
-      const user = data.included.find(e => e.id === data.data.id);
-      if (!user) return;
+      const user = data.included.find(e => e.id === data.data.relationships.user.data.id);
+      if (!user){
+        console.log("aqui")
+        return;
+      } 
+
       this.username = user.attributes.name;
       this.tiempoRestante = data.data.attributes.assigned_time;
     }
