@@ -1,139 +1,102 @@
 from __future__ import unicode_literals, print_function, division
-import time
-
-# import RPi.GPIO as gpio
-from mylab import weblab, redis, socketio
-
+from mylab import weblab
 from flask_babel import gettext
 from weblablib import weblab_user
-import mylab.client
-"""
-This module is just an example of how you could organize your code. Here you would
-manage any code related to your hardware, for example.
+import spidev
 
-In this case, we're going to have a very simple laboratory that we will create
-in a Redis database (in memory). You will have:
+# PINOUT
 
- - 2 lights (0..1)
- - 1 microcontroller, which interacts with the lights
+# A0 - A1 - A2 			tied to GND
+# Reset					tied to 3V3
+# MOSI					tied to rpi MOSI
+# MISO					floating
+# SCLK					tied to rpi SCLK
+# CS					tied to rpi GPIO 8
+# VSS					tied to GND
+# VDD					tied to 3V3
+# All Outputs			tied to Arduino directly
+# INTA					floating
+# INTB					floating
 
-In Redis, we'll work with 3 variables for this:
+spiComm = spidev.SpiDev()
 
- - hardware:lights:0 {on|off}
- - hardware:lights:1 {on|off}
- 
- - hardware:microcontroller {empty|programming|programmed|failed}
-"""
+def set_gpio(gpio, value):
 
-LIGHTS = 2
-# gpio.setmode(gpio.BOARD)
-# gpio.setup(12, gpio.OUT)
-# gpio.setup(16, gpio.OUT)
+	try:
+		with open("/sys/class/gpio/gpio{}/value".format(gpio), "w") as val:
+			val.write("{}".format(value))
+
+	except:
+		pass
+        
+# set IOCON.HAEN check https://www.mouser.es/datasheet/2/268/MCP23017_Data_Sheet_DS20001952-2998473.pdf page17
+def set_HAEN(exp):
+	ControlByte = 0x40 + (exp - 1) * 2
+	set_gpio(8, 0)
+	spiComm.xfer2([ControlByte, 0x0a, 0x28], 5000000, 1000)
+	set_gpio(8, 1)
+
+# Set pins as output/input on both banks
+def set_pins(exp, output=1):
+	ControlByte = 0x40 + (exp - 1) * 2
+	valueByte = 0x00 if output else 0xff
+
+	set_gpio(8, 0)
+	spiComm.xfer2([ControlByte, 0x00, valueByte], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x01, valueByte], 5000000, 1000)
+	set_gpio(8, 1)
+
+# Set output pins low level
+def set_low(exp):
+	ControlByte = 0x40 + (exp - 1) * 2
+
+	set_gpio(8, 0)
+	spiComm.xfer2([ControlByte, 0x14, 0x00], 5000000, 1000)
+	spiComm.xfer2([ControlByte, 0x15, 0x00], 5000000, 1000)
+	set_gpio(8, 1);
+
 
 @weblab.on_start
 def start(client_data, server_data):
     print("************************************************************************")
     print("Preparing laboratory for user {}...".format(weblab_user.username))
-    print()
-    print(" - Typically, here you prepare resources.")
-    print(" - Since this method is run *before* the user goes to the lab, you can't")
-    print("   store information on Flask's 'session'. But you can store it on:")
-    print("   weblab_user.data")
-    weblab_user.data['local_identifier'] = weblab.create_token()
-    print("   In this case: {}".format(weblab_user.data['local_identifier']))
-    print()
-    print("************************************************************************")
 
-    for light in range(LIGHTS):
-        redis.set('hardware:lights:{}'.format(light), 'off')
-        redis.set('client:lights:{}'.format(light), 'off')
-    redis.set('hardware:microcontroller:state', 'empty')
-    redis.delete('hardware:microcontroller:programming')
+    spiComm.open(0, 0)
+    for i in range(1, 4):
+        set_HAEN(i)
+        set_pins(i)
+    clean_resources()
+    spiComm.close()
+    print("Lab is ready!!")
+    print("************************************************************************")
 
 
 @weblab.on_dispose
 def dispose():
     print("************************************************************************")
-    print("Cleaning up laboratory for user {}...".format(weblab_user.username))
-    print()
-    print(" - Typically, here you clean up resources (stop motors, delete programs,")
-    print("   etc.)")
-    print(" - In this example, we'll 'empty' the microcontroller (in a database)")
-    print(
-        " - Testing weblab_user.data: {}".format(weblab_user.data['local_identifier']))
-    print()
+    print("Switching off laboratory for user {}...".format(weblab_user.username))
+    clean_resources()
+    spiComm.close()
     print("************************************************************************")
 
-    clean_resources()
+
 
 
 def clean_resources():
-    """
-    This code could be in dispose(). However, since we want to call this low-level
-    code from outside any request and we can't (since we're using
-    weblab_user.username in dispose())... we separate it. This way, this code can
-    be called from outside using 'flask clean-resources'
-    """
-    redis.set('hardware:microcontroller:state', 'empty')
-    redis.delete('hardware:microcontroller:programming')
-    print("Microcontroller restarted")
-
-
-def is_light_on(number):
-    return redis.get('hardware:lights:{}'.format(number)) == 'on'
-
+    for i in range(1, 4):
+        set_low(i)
 
 def hardware_status():
-    "Return the status of the board"
-    # A pipeline in Redis is a single connection, that run with
-    # transaction=True (the default), it runs all the commands in a single
-    # transaction. It's useful to get all the data in once and to peform
-    # atomic operations
-    pipeline = redis.pipeline()
-
-    for light in range(LIGHTS):
-        pipeline.get('hardware:lights:{}'.format(light))
-
-    pipeline.get('hardware:microcontroller:programming')
-    pipeline.get('hardware:microcontroller:state')
-
-    # Now it's run
-    results = pipeline.execute()
-
-    lights_data = {
-        # 'light-1': True
-    }
-
-    for pos, light_state in enumerate(results[0:LIGHTS]):
-        lights_data['light-{}'.format(pos+1)] = light_state == 'on'
-
-    programming, state = results[LIGHTS:]
-    if programming is not None:
-        microcontroller = gettext('Programming: %(step)s', step=programming)
-    elif state == 'empty':
-        microcontroller = gettext("Empty memory")
-    elif state == 'failed':
-        microcontroller = gettext("Programming failed")
-    elif state == 'programmed':
-        microcontroller = gettext("Programming worked!")
-    else:
-        microcontroller = gettext("Invalid state: %(state)s", state=state)
-
-    task = weblab.get_task(program_device)
-    if task:
-        print("Current programming task status: %s (error: %s; result: %s)" %
-              (task.status, task.error, task.result))
-
-    return dict(lights=lights_data, microcontroller=microcontroller, time_left=weblab_user.time_left)
+    return None
 
 
 @weblab.task(unique='global')
-def program_device():
-
-    if weblab_user.time_left < 10:
+def configure_lab(caso, numero):
+    spiComm.open(0, 0)
+    if weblab_user.time_left < 5:
         print("************************************************************************")
-        print("Error: typically, programming the device takes around 10 seconds. So if ")
-        print("the user has less than 10 seconds (%.2f) to use the laboratory, don't start " %
+        print("Error: typically, configuring the lab takes around 5 seconds. So if ")
+        print("the user has less than 5 seconds (%.2f) to use the laboratory, don't start " %
               weblab_user.time_left)
         print("this task. Otherwise, the user session will still wait until the task")
         print("finishes, delaying the time assigned by the administrator")
@@ -142,66 +105,69 @@ def program_device():
             'success': False,
             'reason': "Too few time: {}".format(weblab_user.time_left)
         }
-
-    print("************************************************************************")
-    print("You decided that you wanted to program the robot, and for some reason,  ")
-    print("this takes time. In weblablib, you can create a 'task': something that  ")
-    print("you can start, and it will be running in a different thread. In this ")
-    print("case, this is lasting for 10 seconds from now ")
-    print("************************************************************************")
-
     
-    if redis.set('hardware:microcontroller:programming', 0) == 0:
-        # Just in case two programs are sent at the very same time
-        return {
-            'success': False,
-            'reason': "Already programming"
-        }
-    
-    #change programming to 0
-    redis.set('hardware:microcontroller:programming', 0)
-    socketio.emit('update-client', mylab.client.client_status(), namespace='/mylab')
-    
-    for step in range(1,5):
-        time.sleep(1)
-        redis.set('hardware:microcontroller:programming', step)
-        socketio.emit('update-client', mylab.client.client_status(), namespace='/mylab')
-        print("Still programming...")
 
-    pipeline = redis.pipeline()
-    for i in range(LIGHTS) :
-        redis_value = redis.get(f'client:lights:{i}')
-        print(f"client:lights:{i}={redis_value}")
-        if (redis.get('client:lights:{}'.format(i)) == 'on'):
-            pipeline.set('hardware:lights:{}'.format(i), 'on')
+    if caso == 'A':
+        if numero == 1:
+            clean_resources()
 
-            if(i == 0):
-                gpio.output(12, True)
-                print("encendiendo gpio12")
-            if(i == 1):
-                gpio.output(16,True)
-                print("encendiendo gpio16")
-        else:
-            pipeline.set('hardware:lights:{}'.format(i), 'off')
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00001110
+            spiComm.xfer2([0x40, 0x14, 0x0e], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00010101
+            spiComm.xfer2([0x40, 0x15, 0x15], 5000000, 1000)
 
-            if (i == 0):
-                gpio.output(12, False)
-                print("apagando gpio12")
-                
-            if (i == 1):
-                gpio.output(16, False)
-                print("apagando gpio16")
-    pipeline.execute()
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+            print("LED1 5V 100ohms")
 
-    print("************************************************************************")
-    print("Yay! the robot has been programmed! Now you can retrieve the result ")
-    print("************************************************************************")
-    pipeline = redis.pipeline()
-    pipeline.set('hardware:microcontroller:state', 'programmed')
-    pipeline.delete('hardware:microcontroller:programming')
-    pipeline.execute()
-    
-    socketio.emit('update-client', hardware_status(), namespace='/mylab')
+        elif numero == 2:
+            clean_resources()
+
+            # caso A.2
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00001110
+            spiComm.xfer2([0x40, 0x14, 0x0e], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00001101
+            spiComm.xfer2([0x40, 0x15, 0x0d], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+            print("LED1 5V 300ohms")
+
+        elif numero == 3:
+            clean_resources()
+            # caso A.3
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00001101
+            spiComm.xfer2([0x40, 0x14, 0x0d], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00010101
+            spiComm.xfer2([0x40, 0x15, 0x15], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 12V 100ohms")
+
+        elif numero == 4:
+            clean_resources()
+		    # caso A.4
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00001101
+            spiComm.xfer2([0x40, 0x14, 0x0d], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00001101
+            spiComm.xfer2([0x40, 0x15, 0x0d], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 12V 300ohms")
+
+    spiComm.close()
     return {
         'success': True
     }
