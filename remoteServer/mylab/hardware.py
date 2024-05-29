@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, print_function, division
+import uuid
 from mylab import weblab
 from flask_babel import gettext
 from weblablib import weblab_user
 import spidev
+
+from mylab.api.models import Measurements
 
 # PINOUT
 
@@ -89,6 +92,27 @@ def clean_resources():
 def hardware_status():
     return None
 
+def get_measurements(caso, numero):
+    # Implementar la lógica para obtener los valores de intensidad y tensión
+    # Ejemplo de datos de prueba
+    if(caso == 'A'):
+        if(numero == 1):
+            current_measurements = [30.1, 30.1, 30.1]
+            voltage_measurements = [2.16, 3.05, 5.24]
+        elif(numero == 2):
+            current_measurements = [9.96,9.96,9.96]
+            voltage_measurements = [1.89, 3.33, 5.24]
+        elif(numero == 3):
+            current_measurements = [92.3,92.3,92.3]
+            voltage_measurements = [2.85, 9.07, 11.98]
+        elif(numero == 4):
+            current_measurements = [29.9,29.9,29.9]
+            voltage_measurements = [2.15, 9.8, 11.98]
+    else:
+        current_measurements = [0,0,0]
+        voltage_measurements = [0,0,0]
+        
+    return Measurements(id=uuid.uuid4(), current=current_measurements, voltage=voltage_measurements)
 
 @weblab.task(unique='global')
 def configure_lab(caso, numero):

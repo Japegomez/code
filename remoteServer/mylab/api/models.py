@@ -11,3 +11,9 @@ class Session:
         self.id = id
         self.assigned_time = assigned_time
         self.user = user
+
+class Measurements:
+    def __init__(self, id, current, voltage):
+        self.id = id
+        self.current = current
+        self.voltage = voltage

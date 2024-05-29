@@ -1,6 +1,7 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { GetMeasurementResponse } from '../../interfaces/measurements';
 import { APIService } from '../../services/api.service';
 import { DynamicTableComponent } from '../dynamic-table/dynamic-table.component';
 
@@ -18,6 +19,7 @@ export class EnSerieComponent {
   tensionData = [0,0,0];
   intensidadData = [0,0,0];
   valorR1: number | undefined;
+  valorFuente = 5;
   isCorrect: boolean = false;
 
 
@@ -72,9 +74,45 @@ export class EnSerieComponent {
     }
   }
 
-  
-  myFunction() {
-    // this.apiService.runLabConfig("EnSerie", 1)
+  updateValorFuente() {
+    var isChecked = (<HTMLInputElement>document.getElementById("tensionFuente")).checked;
+    if (isChecked) {
+      this.valorFuente = 12;
+    } else {
+      this.valorFuente = 5;
+    }
+  }
+
+
+  configLab() {
+    if(this.valorFuente === 5) {
+      if(this.valorR1 === 100){
+        this.apiService.runLabConfig("A",1).subscribe((data: GetMeasurementResponse) => {
+          this.tensionData = data.data.attributes.voltage;
+          this.intensidadData = data.data.attributes.current;
+        });
+      }
+      if(this.valorR1 === 300){
+        this.apiService.runLabConfig("A",2).subscribe((data: GetMeasurementResponse) => {
+          this.tensionData = data.data.attributes.voltage;
+          this.intensidadData = data.data.attributes.current;
+        });
+      }
+    }
+    if(this.valorFuente === 12) {
+      if(this.valorR1 === 100){
+        this.apiService.runLabConfig("A",3).subscribe((data: GetMeasurementResponse) => {
+          this.tensionData = data.data.attributes.voltage;
+          this.intensidadData = data.data.attributes.current;
+        });
+      }
+      if(this.valorR1 === 300){
+        this.apiService.runLabConfig("A",4).subscribe((data: GetMeasurementResponse) => {
+          this.tensionData = data.data.attributes.voltage;
+          this.intensidadData = data.data.attributes.current;
+        });
+      }
+    }
   }
   checkValues() {
     if (this.valorR1 === 100 || this.valorR1 === 300) {

@@ -1,11 +1,12 @@
+import uuid
 from flask import Blueprint, url_for, render_template, jsonify, session, current_app, request
 from flask_cors import cross_origin
 from flask_socketio import emit
 from mylab import weblab
-from mylab.hardware import configure_lab
+from mylab.hardware import configure_lab, get_measurements
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
 from mylab.api.models import Session, User
-from mylab.api.schemas import SessionSchema
+from mylab.api.schemas import MeasurementSchema, SessionSchema
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -30,16 +31,25 @@ def index():
 @main_blueprint.route('/api/v1/config', methods=['GET'])
 @requires_login
 def config():
-    user = User(id="1", name=weblab_user.username, isActive=weblab_user.active)
-    session = Session(id="1", assigned_time=weblab_user.time_left, user=user)
+    user = User(id=uuid.uuid4(), name=weblab_user.username, isActive=weblab_user.active)
+    session = Session(id=uuid.uuid4(), assigned_time=weblab_user.time_left, user=user)
     return SessionSchema(include_data=("user",)).dump(session)
 
 
 @main_blueprint.route('/api/v1/lab/<caso>/<int:numero>', methods=['GET'])
 @requires_active
 def configureLab(caso, numero):
+   
+    if len(weblab.running_tasks):
+        return jsonify(error=True, message="Other tasks being run")
+    
     task = configure_lab.delay(caso, numero)
-    return jsonify('ok')
+    print(task.status)
+
+    measurements = get_measurements(caso, numero)
+
+    return MeasurementSchema().dump(measurements)
+    
 
 @main_blueprint.route('/logout', methods=['POST'])
 @requires_login
