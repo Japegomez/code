@@ -1,18 +1,11 @@
-import time
-
 from flask import Blueprint, url_for, render_template, jsonify, session, current_app, request
 from flask_cors import cross_origin
 from flask_socketio import emit
-import weblablib
-
-from mylab import weblab, socketio
-from mylab.client import client_status, switch_light
-from mylab.hardware import program_device, hardware_status
-
+from mylab import weblab
+from mylab.hardware import configure_lab
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
-
-from mylab.templates.api.models import Session, User
-from mylab.templates.api.schemas import SessionSchema
+from mylab.api.models import Session, User
+from mylab.api.schemas import SessionSchema
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -42,47 +35,11 @@ def config():
     return SessionSchema(include_data=("user",)).dump(session)
 
 
-@main_blueprint.route('/api/v1/lab/')
+@main_blueprint.route('/api/v1/lab/<caso>/<int:numero>', methods=['GET'])
 @requires_active
-def lab():
+def configureLab(caso, numero):
+    task = configure_lab.delay(caso, numero)
     return jsonify('ok')
-###################################################################
-#
-#
-# Socket-IO management
-#
-
-@socketio.on('connect', namespace='/mylab')
-@socket_requires_active
-def connect_handler():
-    emit('update-client', client_status(), namespace='/mylab')
-
-@socketio.on('lights', namespace='/mylab')
-@socket_requires_active
-def lights_event(data):
-    state = data['state']
-    number = data['number']
-    switch_light(number, state)
-    emit('update-client', client_status(), namespace='/mylab')
-
-@socketio.on('program', namespace='/mylab')
-@socket_requires_active
-def microcontroller():
-    
-    # If there are running tasks, don't let them send the program
-    if len(weblab.running_tasks):
-        return jsonify(error=True, message="Other tasks being run")
-
-    task = program_device.delay()
-
-    # Playing with a task:
-    current_app.logger.debug("New task! {}".format(task.task_id))
-    current_app.logger.debug(" - Name: {}".format(task.name))
-    current_app.logger.debug(" - Status: {}".format(task.status))
-
-    # Result and error will be None unless status is 'done' or 'failed'
-    current_app.logger.debug(" - Result: {}".format(task.result))
-    current_app.logger.debug(" - Error: {}".format(task.error))
 
 @main_blueprint.route('/logout', methods=['POST'])
 @requires_login
@@ -94,12 +51,6 @@ def logout_view():
         logout()
 
     return jsonify(error=False)
-
-#######################################################
-#
-#   Other functions
-#
-
 
 def _check_csrf():
     expected = session.get('csrf')
