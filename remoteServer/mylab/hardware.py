@@ -108,9 +108,16 @@ def get_measurements(caso, numero):
         elif(numero == 4):
             current_measurements = [29.9,29.9,29.9]
             voltage_measurements = [2.15, 9.8, 11.98]
-    else:
-        current_measurements = [0,0,0]
-        voltage_measurements = [0,0,0]
+    if(caso == 'B '):
+        if(numero == 1):
+            current_measurements = [13.4, 13.4, 13.4,4.9]
+            voltage_measurements = [1.94, 1.91 , 1.37, 5.24]
+        elif(numero == 2):
+            current_measurements = [4.9,4.9,4.9,4.9]
+            voltage_measurements = [1.79, 1.78, 1.66,5.24]
+        elif(numero == 3):
+            current_measurements = [68.5,68.5,68.5,4.9]
+            voltage_measurements = [2.58, 2.44, 6.88,11.98]
         
     return Measurements(id=uuid.uuid4(), current=current_measurements, voltage=voltage_measurements)
 
@@ -190,6 +197,51 @@ def configure_lab(caso, numero):
             set_gpio(8, 1)
 
             print("LED1 12V 300ohms")
+
+    if caso == 'B':
+        if numero == 1:
+            clean_resources()
+            # caso B.1
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 01001110
+            spiComm.xfer2([0x40, 0x14, 0x4e], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00000000
+            spiComm.xfer2([0x40, 0x15, 0x00], 5000000, 1000)
+            
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00001010
+            spiComm.xfer2([0x42, 0x14, 0x0a], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 LED2 5V 100ohms")
+
+        elif numero == 2:
+            clean_resources()
+            # caso B.2
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 01001110
+            spiComm.xfer2([0x40, 0x14, 0x4e], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00000000
+            spiComm.xfer2([0x40, 0x15, 0x00], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00010010
+            spiComm.xfer2([0x42, 0x14, 0x12], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 LED2 5V 300ohms")   
+
+        elif numero == 3:
+            clean_resources()
+            # caso B.3
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 01001101
+            spiComm.xfer2([0x40, 0x14, 0x4d], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00000000
+            spiComm.xfer2([0x40, 0x15, 0x00], 5000000, 1000)
+            
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00001010
+            spiComm.xfer2([0x42, 0x14, 0x0a], 5000000, 1000)
+            set_gpio(8, 1)
+            print("LED1 LED2 12V 100ohms")
 
     spiComm.close()
     return {
