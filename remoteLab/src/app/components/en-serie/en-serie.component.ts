@@ -85,32 +85,64 @@ export class EnSerieComponent {
 
 
   configLab() {
-    if(this.valorFuente === 5) {
-      if(this.valorR1 === 100){
-        this.apiService.runLabConfig("A",1).subscribe((data: GetMeasurementResponse) => {
-          this.tensionData = data.data.attributes.voltage;
-          this.intensidadData = data.data.attributes.current;
-        });
+    if(this._numDiodosEnSerie === "1diodo") {
+      if(this.valorFuente === 5) {
+        if(this.valorR1 === 100){
+          this.apiService.runLabConfig("A",1).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+        if(this.valorR1 === 300){
+          this.apiService.runLabConfig("A",2).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
       }
-      if(this.valorR1 === 300){
-        this.apiService.runLabConfig("A",2).subscribe((data: GetMeasurementResponse) => {
-          this.tensionData = data.data.attributes.voltage;
-          this.intensidadData = data.data.attributes.current;
-        });
+      if(this.valorFuente === 12) {
+        if(this.valorR1 === 100){
+          this.apiService.runLabConfig("A",3).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+        if(this.valorR1 === 300){
+          this.apiService.runLabConfig("A",4).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
       }
     }
-    if(this.valorFuente === 12) {
-      if(this.valorR1 === 100){
-        this.apiService.runLabConfig("A",3).subscribe((data: GetMeasurementResponse) => {
-          this.tensionData = data.data.attributes.voltage;
-          this.intensidadData = data.data.attributes.current;
-        });
+    if(this._numDiodosEnSerie==="2diodos") {
+      if(this.valorFuente === 5) {
+        if(this.valorR1 === 100){
+          this.apiService.runLabConfig("B",1).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+        if(this.valorR1 === 300){
+          this.apiService.runLabConfig("B",2).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
       }
-      if(this.valorR1 === 300){
-        this.apiService.runLabConfig("A",4).subscribe((data: GetMeasurementResponse) => {
-          this.tensionData = data.data.attributes.voltage;
-          this.intensidadData = data.data.attributes.current;
-        });
+      if(this.valorFuente === 12) {
+        if(this.valorR1 === 100){
+          this.apiService.runLabConfig("B",3).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+        if(this.valorR1 === 300){
+          this.apiService.runLabConfig("B",4).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
       }
     }
   }
