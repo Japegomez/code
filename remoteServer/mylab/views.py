@@ -1,12 +1,12 @@
 import uuid
-from flask import Blueprint, url_for, render_template, jsonify, session, current_app, request
+from flask import Blueprint, Response, url_for, render_template, jsonify, session, current_app, request
 from flask_cors import cross_origin
 from flask_socketio import emit
 from mylab import weblab
-from mylab.hardware import configure_lab, get_measurements
+from mylab.hardware import capture_image, configure_lab, get_measurements
 from weblablib import requires_active, requires_login, socket_requires_active, weblab_user, logout
 from mylab.api.models import Session, User
-from mylab.api.schemas import MeasurementSchema, SessionSchema
+from mylab.api.schemas import ImageSchema, MeasurementSchema, SessionSchema
 
 main_blueprint = Blueprint('main', __name__)
 
@@ -50,6 +50,15 @@ def configureLab(caso, numero):
 
     return MeasurementSchema().dump(measurements)
     
+
+@main_blueprint.route('/api/v1/image', methods=['GET'])
+@requires_active
+def get_image():
+    image = capture_image()
+    if image:
+        return Response(image, mimetype='image/jpeg')
+    return jsonify({'error': 'Failed to capture image'}), 500
+
 
 @main_blueprint.route('/logout', methods=['POST'])
 @requires_login

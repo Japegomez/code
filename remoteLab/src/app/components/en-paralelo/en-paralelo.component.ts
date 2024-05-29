@@ -1,14 +1,17 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { GetMeasurementResponse } from '../../interfaces/measurements';
+import { APIService } from '../../services/api.service';
 import { DynamicTableComponent } from '../dynamic-table/dynamic-table.component';
+import { CameraViewerComponent } from "../camera-viewer/camera-viewer.component";
 
 @Component({
-  selector: 'app-en-paralelo',
-  standalone: true,
-  imports: [FormsModule,NgClass, DynamicTableComponent],
-  templateUrl: './en-paralelo.component.html',
-  styleUrl: './en-paralelo.component.css'
+    selector: 'app-en-paralelo',
+    standalone: true,
+    templateUrl: './en-paralelo.component.html',
+    styleUrl: './en-paralelo.component.css',
+    imports: [FormsModule, NgClass, DynamicTableComponent, CameraViewerComponent]
 })
 export class EnParaleloComponent {
   _numRamasEnParalelo = '2ramas';
@@ -19,7 +22,11 @@ export class EnParaleloComponent {
   valorR1: number | undefined;
   valorR2: number | undefined;
   valorR3: number | undefined;
+  valorFuente = 5;
   isCorrect: boolean = false;
+
+  constructor(private apiService: APIService) {
+  }
 
   get numRamasEnParalelo() {
     return this._numRamasEnParalelo;
@@ -59,15 +66,58 @@ export class EnParaleloComponent {
     }
   }
 
+    updateValorFuente() {
+    var isChecked = (<HTMLInputElement>document.getElementById("tensionFuente")).checked;
+    if (isChecked) {
+      this.valorFuente = 12;
+    } else {
+      this.valorFuente = 5;
+    }
+  }
+
+  configLab() {
+    if(this._numRamasEnParalelo==="2ramas") {
+      if(this.valorFuente === 5) {
+        if(this.valorR1 === 100 && this.valorR2 === 100){
+          this.apiService.runLabConfig("C",1).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+        else if(this.valorR1 === 100 && this.valorR2 === 300){
+          this.apiService.runLabConfig("C",2).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+      }
+      if(this.valorFuente === 12) {
+        if(this.valorR1 === 100 && this.valorR2 === 100){
+          this.apiService.runLabConfig("C",3).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+        if(this.valorR1 === 100 && this.valorR2 === 300){
+          this.apiService.runLabConfig("C",4).subscribe((data: GetMeasurementResponse) => {
+            this.tensionData = data.data.attributes.voltage;
+            this.intensidadData = data.data.attributes.current;
+          });
+        }
+      }
+    }
+    if(this._numRamasEnParalelo==="3diodos") {
+    }
+  }
   checkValues() {
     if (this._numRamasEnParalelo === '2ramas') {
-      if ((this.valorR1 === 100 || this.valorR1 === 300) && (this.valorR2 === 100 || this.valorR2 === 300)) {
+      if ((this.valorR1 === 100) && (this.valorR2 === 100 || this.valorR2 === 300)) {
         this.isCorrect = true;
       } else {
         this.isCorrect = false;
       }
     } else if (this._numRamasEnParalelo === '3ramas') {
-      if ((this.valorR1 === 100 || this.valorR1 === 300) && (this.valorR2 === 100 || this.valorR2 === 300) && (this.valorR3 === 100 || this.valorR3 === 300)) {
+      if ((this.valorR1 === 100 && this.valorR2===100 && this.valorR3 ===100) || (this.valorR1 === 100 && this.valorR2===100 && this.valorR3 ===300) || (this.valorR1 === 300 && this.valorR2===300 && this.valorR3 ===300) || (this.valorR1 === 300 && this.valorR2===300 && this.valorR3 ===100)){
         this.isCorrect = true;
       } else {
         this.isCorrect = false;

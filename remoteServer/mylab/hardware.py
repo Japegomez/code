@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, print_function, division
+import base64
 import uuid
+
+import cv2
 from mylab import weblab
 from flask_babel import gettext
 from weblablib import weblab_user
@@ -108,7 +111,10 @@ def get_measurements(caso, numero):
         elif(numero == 4):
             current_measurements = [29.9,29.9,29.9]
             voltage_measurements = [2.15, 9.8, 11.98]
-    if(caso == 'B '):
+        else:
+            current_measurements = [68.5,68.5,68.5,4.9]
+            voltage_measurements = [2.58, 2.44, 6.88,11.98]
+    elif(caso == 'B'):
         if(numero == 1):
             current_measurements = [13.4, 13.4, 13.4,4.9]
             voltage_measurements = [1.94, 1.91 , 1.37, 5.24]
@@ -118,7 +124,25 @@ def get_measurements(caso, numero):
         elif(numero == 3):
             current_measurements = [68.5,68.5,68.5,4.9]
             voltage_measurements = [2.58, 2.44, 6.88,11.98]
-        
+        else:
+            current_measurements = [68.5,68.5,68.5,4.9]
+            voltage_measurements = [1.58, 2.44, 6.88,11.98]
+    elif(caso == 'C'):
+        if(numero == 1):
+            current_measurements = [31.2,30.4,31.2,30.4,31.2,30.4,60.6]
+            voltage_measurements = [2.09,2.14,3.10,3.05,5.19,5.19,5.24]
+        elif(numero == 2):
+            current_measurements = [30.6,10,30.6,10,30.6,10,41.2]
+            voltage_measurements = [2.09,1.87,3.1,3.33,5.19,5.21,5.24]
+        elif(numero == 3):
+            current_measurements = [96,92.6,96,92.6,96,92.6,186.7]
+            voltage_measurements = [2.69,2.82,9.15,9.03,11.84,11.85,11.98]
+        else:
+            current_measurements = [96.1,29.7,96.1,29.7,96.1,29.7,124.1]
+            voltage_measurements = [2.7,2.14,9.13,9.68,11.2,11.82,11.98]
+    else:
+        current_measurements = [68.5,68.5,68.5,4.9]
+        voltage_measurements = [3.58, 2.44, 6.88,11.98]
     return Measurements(id=uuid.uuid4(), current=current_measurements, voltage=voltage_measurements)
 
 @weblab.task(unique='global')
@@ -183,7 +207,7 @@ def configure_lab(caso, numero):
 
             print("LED1 12V 100ohms")
 
-        elif numero == 4:
+        else:
             clean_resources()
 		    # caso A.4
             set_gpio(8, 0)
@@ -242,8 +266,75 @@ def configure_lab(caso, numero):
             spiComm.xfer2([0x42, 0x14, 0x0a], 5000000, 1000)
             set_gpio(8, 1)
             print("LED1 LED2 12V 100ohms")
+    if caso == 'C':
+        if numero == 1:
+            clean_resources()
+            # caso C.1
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00011110
+            spiComm.xfer2([0x40, 0x14, 0x1e], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 01010101
+            spiComm.xfer2([0x40, 0x15, 0x55], 5000000, 1000)
 
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 LED3 5V 100ohms 100ohms")
+        elif numero == 2:
+            clean_resources()
+            # caso C.2
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00011110
+            spiComm.xfer2([0x40, 0x14, 0x1e], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00110101
+            spiComm.xfer2([0x40, 0x15, 0x35], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 LED3 5V 100ohms 300ohms")
+        elif numero == 3:
+            clean_resources()
+            # caso C.3
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00011101
+            spiComm.xfer2([0x40, 0x14, 0x1d], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 01010101
+            spiComm.xfer2([0x40, 0x15, 0x55], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 LED3 12V 100ohms 100ohms")
+        else:
+            clean_resources()
+            # caso C.4
+            set_gpio(8, 0)
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00011101
+            spiComm.xfer2([0x40, 0x14, 0x1d], 5000000, 1000)
+            # B7 B6 B5 B4 B3 B2 B1 B0 / 00110101
+            spiComm.xfer2([0x40, 0x15, 0x35], 5000000, 1000)
+
+            # A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
+            spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
+            set_gpio(8, 1)
+
+            print("LED1 LED3 12V 100ohms 300ohms")
+            
     spiComm.close()
     return {
         'success': True
     }
+
+def capture_image():
+    camera = cv2.VideoCapture(0)  # Cambia el índice si tienes más de una cámara
+    ret, frame = camera.read()
+    if ret:
+        _, buffer = cv2.imencode('.jpg', frame)
+        camera.release()
+        return buffer.tobytes()
+    camera.release()
+    return None
