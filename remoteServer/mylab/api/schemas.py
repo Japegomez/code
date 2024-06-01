@@ -29,3 +29,10 @@ class MeasurementSchema(Schema):
 
     class Meta:
         type_ = 'measurements'
+
+class ImageSchema(Schema):
+    id = fields.UUID(required=True, default=lambda: str(uuid.uuid4()))
+    image = fields.Str(required=True)
+
+    class Meta:
+        type_ = 'image'

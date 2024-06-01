@@ -3,12 +3,13 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { GetMeasurementResponse } from '../../interfaces/measurements';
 import { APIService } from '../../services/api.service';
+import { CameraViewerComponent } from '../camera-viewer/camera-viewer.component';
 import { DynamicTableComponent } from '../dynamic-table/dynamic-table.component';
 
 @Component({
   selector: 'app-en-serie',
   standalone: true,
-  imports: [FormsModule, NgClass, DynamicTableComponent],
+  imports: [FormsModule, NgClass, DynamicTableComponent,CameraViewerComponent],
   templateUrl: './en-serie.component.html',
   styleUrl: './en-serie.component.css'
 })

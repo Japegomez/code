@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
+import { GetCameraResponse } from '../interfaces/camera';
 import { GetMeasurementResponse } from '../interfaces/measurements';
 import { GetSessionConfigResponse } from '../interfaces/sessionConfig';
 
@@ -10,6 +11,7 @@ import { GetSessionConfigResponse } from '../interfaces/sessionConfig';
 export class APIService {
   sessionConfig?: GetSessionConfigResponse;
   measurements?: GetMeasurementResponse;
+  camera?: GetCameraResponse;
   constructor(private http: HttpClient ) { 
   }
   getSessionConfig(): Observable<GetSessionConfigResponse> {
@@ -22,7 +24,6 @@ export class APIService {
     ); 
   }
 
-
   runLabConfig(typeCircuit: string, subtype: number): Observable<GetMeasurementResponse> {
     return this.http.get<GetMeasurementResponse>(`http://pi:5000/api/v1/lab/${typeCircuit}/${subtype}`, {
       withCredentials: true
@@ -34,6 +35,14 @@ export class APIService {
 
   }
 
-
+getImage(): Observable<{ id: string, image: Blob }> {
+    return this.http.get('http://pi:5000/api/v1/image', { withCredentials:true, observe: 'response', responseType: 'blob' })
+      .pipe(
+        map(response => {
+          const id = response.headers.get('Image-ID') || '';
+          return { id, image: response.body as Blob };
+        })
+      );
+    }
 }
 
