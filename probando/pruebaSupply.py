@@ -87,7 +87,7 @@ while True:
 		set_gpio(18, 0)
 		spiComm.xfer2([0x40, 0x14, 0x01], 5000000, 1000)
 		spiComm.xfer2([0x40, 0x15, 0x00], 5000000, 1000)
-
+		set_gpio(18, 1)
 
 		print("12V ON")
 		time.sleep(2)
@@ -99,7 +99,6 @@ while True:
 		set_gpio(18, 1)
 
 		set_gpio(18, 0)
-		
 		# ponemos E2GPA0 a 1 para alimentar con 5V
 		spiComm.xfer2([0x42, 0x14, 0x01], 5000000, 1000)
 		spiComm.xfer2([0x42, 0x15, 0x00], 5000000, 1000)
