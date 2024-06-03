@@ -1,12 +1,11 @@
 from flask import Flask, request, render_template, jsonify, url_for
 from weblablib import WebLab, requires_active, requires_login, weblab_user
 
-# sudo service redis-server start
 # set FLASK_APP=laboratory.py
 # set FLASK_DEBUG=1
 # flask run
 # flask weblab fake new
-# flask weblab fake new --name "Homer Simpson" --username hsimpson --username-unique "hsimpson@labsland" --assigned-time 60 --back https://en.wikipedia.org/wiki/Homer_Simpson --locale es
+# flask weblab fake new --name "Homer Simpson" --username hsimpson --username-unique "hsimpson@labsland" --assigned-time 600 --back https://en.wikipedia.org/wiki/Homer_Simpson --locale es
 app = Flask(__name__)
 weblab = WebLab()
 
