@@ -75,9 +75,10 @@ for i in range(1, 4):
 while True:
 
 	try:
-	    # ponemos todo el expansor1 a 0
+	    # ponemos todo el expansor1 y expansor2 a 0
 		set_gpio(8, 0)
 		set_low(1)
+		set_low(2)
 		set_gpio(8, 1)
 
 		# caso A.1
@@ -97,6 +98,7 @@ while True:
         # ponemos todo el expansor1 a 0
 		set_gpio(8, 0)
 		set_low(1)
+		set_low(2)
 		set_gpio(8, 1)
 
 		# caso A.2
@@ -116,6 +118,7 @@ while True:
         # ponemos todo el expansor1 a 0
 		set_gpio(8, 0)
 		set_low(1)
+		set_low(2)
 		set_gpio(8, 1)
 
 		# caso A.3
@@ -125,8 +128,6 @@ while True:
 		# B7 B6 B5 B4 B3 B2 B1 B0 / 00010101
 		spiComm.xfer2([0x40, 0x15, 0x15], 5000000, 1000)
 
-		# A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
-		spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
 		set_gpio(8, 1)
 
 		print("LED1 12V 100ohms")
@@ -135,6 +136,7 @@ while True:
         # ponemos todo el expansor1 a 0
 		set_gpio(8, 0)
 		set_low(1)
+		set_low(2)
 		set_gpio(8, 1)
 
 		# caso A.4
