@@ -87,9 +87,6 @@ while True:
 		spiComm.xfer2([0x40, 0x14, 0x0e], 5000000, 1000)
 		# B7 B6 B5 B4 B3 B2 B1 B0 / 00010101
 		spiComm.xfer2([0x40, 0x15, 0x15], 5000000, 1000)
-
-		# A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
-		spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
 		set_gpio(8, 1)
 
 		print("LED1 5V 100ohms")
@@ -107,9 +104,6 @@ while True:
 		spiComm.xfer2([0x40, 0x14, 0x0e], 5000000, 1000)
 		# B7 B6 B5 B4 B3 B2 B1 B0 / 00001101
 		spiComm.xfer2([0x40, 0x15, 0x0d], 5000000, 1000)
-
-		# A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
-		spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
 		set_gpio(8, 1)
 
 		print("LED1 5V 300ohms")
@@ -127,7 +121,6 @@ while True:
 		spiComm.xfer2([0x40, 0x14, 0x0d], 5000000, 1000)
 		# B7 B6 B5 B4 B3 B2 B1 B0 / 00010101
 		spiComm.xfer2([0x40, 0x15, 0x15], 5000000, 1000)
-
 		set_gpio(8, 1)
 
 		print("LED1 12V 100ohms")
@@ -145,9 +138,6 @@ while True:
 		spiComm.xfer2([0x40, 0x14, 0x0d], 5000000, 1000)
 		# B7 B6 B5 B4 B3 B2 B1 B0 / 00001101
 		spiComm.xfer2([0x40, 0x15, 0x0d], 5000000, 1000)
-
-		# A7 A6 A5 A4 A3 A2 A1 A0 / 00000000
-		spiComm.xfer2([0x42, 0x14, 0x00], 5000000, 1000)
 		set_gpio(8, 1)
 
 		print("LED1 12V 300ohms")
