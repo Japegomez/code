@@ -28,7 +28,6 @@ export class AppComponent {
     this.apiService.getSessionConfig().subscribe((data: GetSessionConfigResponse) => {
       const user = data.included.find(e => e.id === data.data.relationships.user.data.id);
       if (!user){
-        console.log("aqui")
         return;
       } 
 

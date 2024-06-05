@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map, tap } from 'rxjs';
 import { GetCameraResponse } from '../interfaces/camera';
@@ -25,14 +25,23 @@ export class APIService {
   }
 
   runLabConfig(typeCircuit: string, subtype: number): Observable<GetMeasurementResponse> {
-    return this.http.get<GetMeasurementResponse>(`http://pi:5000/api/v1/lab/${typeCircuit}/${subtype}`, {
+    const url = 'http://pi:5000/api/v1/lab';
+    const body = {
+      caso: typeCircuit,
+      numero: subtype
+    };
+    const options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      }),
       withCredentials: true
-    }).pipe(
+    };
+
+    return this.http.post<GetMeasurementResponse>(url, body, options).pipe(
       tap((data: GetMeasurementResponse) => {
         this.measurements = data;
       })
     );
-
   }
 
 getImage(): Observable<{ id: string, image: Blob }> {

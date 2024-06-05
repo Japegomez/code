@@ -26,7 +26,7 @@ def index():
     # CSRF attacks (check https://en.wikipedia.org/wiki/Cross-site_request_forgery )
     session['csrf'] = weblab.create_token()
 
-    return render_template("index.html")
+    return None
 
 @main_blueprint.route('/api/v1/config', methods=['GET'])
 @requires_login
@@ -36,13 +36,20 @@ def config():
     return SessionSchema(include_data=("user",)).dump(session)
 
 
-@main_blueprint.route('/api/v1/lab/<caso>/<int:numero>', methods=['GET'])
+@main_blueprint.route('/api/v1/lab', methods=['POST'])
 @requires_active
-def configureLab(caso, numero):
-   
+def configureLab():
+    data = request.get_json()
+
+    caso = data.get('caso')
+    numero = data.get('numero')
+
+    if not caso or not isinstance(numero, int):
+        return jsonify(error=True, message="Invalid input data"), 400
+
     if len(weblab.running_tasks):
         return jsonify(error=True, message="Other tasks being run")
-    
+
     task = configure_lab.delay(caso, numero)
     print(task.status)
 
