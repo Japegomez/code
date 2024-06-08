@@ -70,25 +70,9 @@ def get_image():
 @main_blueprint.route('/api/v1/logout', methods=['POST'])
 @requires_login
 def logout_view():
-    if not _check_csrf():
-        return jsonify(error=True, message="Invalid JSON")
 
     if weblab_user.active:
         logout()
 
     return jsonify(error=False)
 
-def _check_csrf():
-    expected = session.get('csrf')
-    if not expected:
-        current_app.logger.warning(
-            "No CSRF in session. Calling method before loading index?")
-        return False
-
-    obtained = request.values.get('csrf')
-    if not obtained:
-        # No CSRF passed.
-        current_app.logger.warning("Missing CSRF in provided data")
-        return False
-
-    return expected == obtained
