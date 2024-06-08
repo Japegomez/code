@@ -67,7 +67,7 @@ def get_image():
     return jsonify({'error': 'Failed to capture image'}), 500
 
 
-@main_blueprint.route('/logout', methods=['POST'])
+@main_blueprint.route('/api/v1/logout', methods=['POST'])
 @requires_login
 def logout_view():
     if not _check_csrf():
