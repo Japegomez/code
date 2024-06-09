@@ -3,4 +3,4 @@ __pycache__/
 .webassets-cache/
 gen/
 a.py
-env/
+myenv/

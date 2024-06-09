@@ -44,14 +44,18 @@ export class APIService {
     );
   }
 
-getImage(): Observable<{ id: string, image: Blob }> {
-    return this.http.get('http://pi:5000/api/v1/image', { withCredentials:true, observe: 'response', responseType: 'blob' })
-      .pipe(
-        map(response => {
-          const id = response.headers.get('Image-ID') || '';
-          return { id, image: response.body as Blob };
-        })
-      );
-    }
+  getImage(): Observable<{ id: string, image: Blob }> {
+      return this.http.get('http://pi:5000/api/v1/image', { withCredentials:true, observe: 'response', responseType: 'blob' })
+        .pipe(
+          map(response => {
+            const id = response.headers.get('Image-ID') || '';
+            return { id, image: response.body as Blob };
+          })
+        );
+      }
+  logout() {
+    return this.http.post('http://pi:5000/api/v1/logout',{},{ withCredentials: true });
+  }
+  
 }
 
