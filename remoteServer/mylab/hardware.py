@@ -81,6 +81,7 @@ def start(client_data, server_data):
 def dispose():
     print("************************************************************************")
     print("Switching off laboratory for user {}...".format(weblab_user.username))
+    spiComm.open(0, 0)
     clean_resources()
     spiComm.close()
     print("************************************************************************")
