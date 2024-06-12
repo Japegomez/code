@@ -32,7 +32,7 @@ class Config(object):
 
     # Other parameters (and default values):
     #
-    WEBLAB_TIMEOUT = 300 # If the user doesn't reply in 5 minutes, consider expired
+    WEBLAB_TIMEOUT = 3600 
     WEBLAB_REDIS_URL = 'redis://localhost:6379/0'
     WEBLAB_TASK_EXPIRES = 100 # Time to expire the session results
     WEBLAB_EXPIRED_USERS_TIMEOUT = 0 # How long an expired user can be before kicked out

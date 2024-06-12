@@ -2,11 +2,12 @@ import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DynamicTableComponent } from '../dynamic-table/dynamic-table.component';
+import { CameraViewerComponent } from '../camera-viewer/camera-viewer.component';
 
 @Component({
   selector: 'app-serie-yparalelo',
   standalone: true,
-  imports: [FormsModule, NgClass, DynamicTableComponent],
+  imports: [FormsModule, NgClass, DynamicTableComponent, CameraViewerComponent],
   templateUrl: './serie-yparalelo.component.html',
   styleUrl: './serie-yparalelo.component.css'
 })
